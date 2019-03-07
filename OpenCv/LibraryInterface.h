@@ -25,6 +25,7 @@ namespace cv {
         IMREAD_REDUCED_COLOR_8 = 65, //!< If set, always convert image to the 3 channel BGR color image and the image size reduced 1/8.
         IMREAD_IGNORE_ORIENTATION = 128 //!< If set, do not rotate the image according to EXIF's orientation flag.
     };
+
     enum ThresholdTypes {
         THRESH_BINARY = 0, //!< \f[\texttt{dst} (x,y) =  \fork{\texttt{maxval}}{if \(\texttt{src}(x,y) > \texttt{thresh}\)}{0}{otherwise}\f]
         THRESH_BINARY_INV = 1, //!< \f[\texttt{dst} (x,y) =  \fork{0}{if \(\texttt{src}(x,y) > \texttt{thresh}\)}{\texttt{maxval}}{otherwise}\f]
@@ -36,6 +37,27 @@ namespace cv {
         THRESH_TRIANGLE = 16 //!< flag, use Triangle algorithm to choose the optimal threshold value
     };
 
+    struct CvMoments
+    {
+        double  m00, m10, m01, m20, m11, m02, m30, m21, m12, m03; /* spatial moments */
+        double  mu20, mu11, mu02, mu30, mu21, mu12, mu03; /* central moments */
+        double  inv_sqrt_m00; /* m00 != 0 ? 1/sqrt(m00) : 0 */
+    };
+
+    static CvMoments c(const Moments m)
+    {
+        CvMoments ret;
+        ret.m00 = m.m00; ret.m10 = m.m10; ret.m01 = m.m01;
+        ret.m20 = m.m20; ret.m11 = m.m11; ret.m02 = m.m02;
+        ret.m30 = m.m30; ret.m21 = m.m21; ret.m12 = m.m12; ret.m03 = m.m03;
+        ret.mu20 = m.mu20; ret.mu11 = m.mu11; ret.mu02 = m.mu02;
+        ret.mu30 = m.mu30; ret.mu21 = m.mu21; ret.mu12 = m.mu12; ret.mu03 = m.mu03;
+        const double am00 = std::abs(m.m00);
+        ret.inv_sqrt_m00 = am00 > DBL_EPSILON ? 1. / std::sqrt(am00) : 0;
+
+        return ret;
+    }
+
     static inline Scalar morphologyDefaultBorderValue() { return Scalar::all(DBL_MAX); }
     Mat imread(const String& filename, int flags = IMREAD_COLOR);
     double contourArea(InputArray contour, bool oriented = false);
@@ -43,6 +65,7 @@ namespace cv {
     void dilate(InputArray src, OutputArray dst, InputArray kernel, Point anchor = Point(-1, -1), int iterations = 1, int borderType = BORDER_CONSTANT, const Scalar& borderValue = morphologyDefaultBorderValue());
     double threshold(InputArray src, OutputArray dst, double thresh, double maxval, int type);
     void cvtColor(InputArray src, OutputArray dst, int code, int dstCn = 0);
+    Moments moments(InputArray array, bool binaryImage = false);
 
     OPENCV_API(cv::Mat*) core_Mat_new1();
     OPENCV_API(cv::Mat*) imgcodecs_imread(const char *filename, int flags);
@@ -61,6 +84,7 @@ namespace cv {
     OPENCV_API(double) imgproc_threshold(cv::_InputArray *src, cv::_OutputArray *dst, double thresh, double maxval, int type);
     OPENCV_API(void) imgproc_cvtColor(cv::_InputArray *src, cv::_OutputArray *dst, int code, int dstCn);
     OPENCV_API(void) core_absdiff(cv::_InputArray *src1, cv::_InputArray *src2, cv::_OutputArray *dst);
+    OPENCV_API(cv::CvMoments) imgproc_moments(cv::_InputArray *arr, int binaryImage);
 
     OPENCV_API(int) core_inputarray_kind(cv::_InputArray *src1);
     OPENCV_API(bool) core_mat_data(cv::Mat *src1);

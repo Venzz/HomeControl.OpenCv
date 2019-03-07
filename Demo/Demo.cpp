@@ -22,5 +22,6 @@ int main()
     cv::imgproc_threshold(&(cv::_InputArray)*pictureDifference, &(cv::_OutputArray)*pictureThreshold, 25, 255, cv::ThresholdTypes::THRESH_BINARY);
     cv::imgproc_dilate(&(cv::_InputArray)*pictureThreshold, &(cv::_OutputArray)*pictureDilated, &(cv::_InputOutputArray)*cv::core_Mat_new1(), CvPoint(-1, -1), 2, 0, CvScalar());
     cv::imgproc_findContours1_OutputArray(&(cv::_InputOutputArray)*pictureDilated, contours, &(cv::_OutputArray)*hierarchy, 0, 2, CvPoint());
+    cv::imgproc_moments(&(cv::_InputArray)*basePicture, 0);
     return 0;
 }

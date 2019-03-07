@@ -115,3 +115,9 @@ OPENCV_API(bool) core_mat_dims(cv::Mat *src1)
 {
     return src1->dims == 0;
 }
+
+OPENCV_API(cv::CvMoments) imgproc_moments(cv::_InputArray *arr, int binaryImage)
+{
+    cv::Moments m = cv::moments(*arr, binaryImage != 0);
+    return c(m);
+}
